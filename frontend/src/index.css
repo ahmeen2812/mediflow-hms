@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+/* Define your Clinical Theme for Tailwind v4 */
+@theme {
+  --color-clinical-navy: #123A56;
+  --color-clinical-blue: #176B9C;
+  --color-clinical-teal: #0F766E;
+  --color-clinical-background: #F5F7F9;
+  --color-clinical-border: #D9E1E7;
+  --color-clinical-text: #182B3A;
+  --color-clinical-muted: #607383;
+
+  --color-status-success: #16805B;
+  --color-status-warning: #A66A00;
+  --color-status-critical: #B42318;
+}
+
+@layer base {
+  body {
+    /* Now these variables exist! */
+    @apply bg-clinical-background text-clinical-text;
+    font-family: 'Inter', sans-serif;
+  }
+}
