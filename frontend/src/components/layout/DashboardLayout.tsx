@@ -64,21 +64,32 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, role = "Adm
         `}
       >
         {/* LOGO AREA */}
-        <div className="h-16 flex items-center px-5 border-b border-white/10 flex-shrink-0">
-          <div className="w-8 h-8 bg-clinical-blue rounded flex items-center justify-center flex-shrink-0 text-white font-extrabold text-sm shadow-sm">
-            M
+         <div className="h-16 flex items-center px-4 border-b border-white/10 flex-shrink-0">
+          <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center flex-shrink-0 shadow-sm border border-blue-200">
+            <svg viewBox="0 0 400 400" className="w-7 h-7">
+              <path
+                d="M200 320 C185 300 90 220 90 150 C90 100 130 65 175 75 C190 78 200 88 200 88 C200 88 210 78 225 75 C270 65 310 100 310 150 C310 220 215 300 200 320 Z"
+                fill="none"
+                stroke="#143A82"
+                strokeWidth="40"
+                strokeLinecap="round"
+                strokeLinejoin="bevel"
+                strokeDasharray="20, 5"
+              />
+            </svg>
           </div>
           {!collapsed && (
             <div className="ml-3">
-              <span className="font-extrabold text-white tracking-wider text-base uppercase leading-none block">
-                MediFlow
+              <span className="font-extrabold text-white tracking-wider text-sm uppercase leading-none block">
+                Elixora Health
               </span>
-              <span className="text-[10px] text-white/50 tracking-widest uppercase font-semibold block mt-0.5">
-                Hospital OS
+              <span className="text-[9px] text-blue-300/60 tracking-widest uppercase font-semibold block mt-0.5">
+                Hospital OS • Since 2026
               </span>
             </div>
           )}
         </div>
+
 
         {/* NAVIGATION ITEMS */}
         <nav className="flex-1 py-3 overflow-y-auto space-y-0.5">
