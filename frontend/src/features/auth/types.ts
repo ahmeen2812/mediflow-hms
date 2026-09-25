@@ -1,14 +1,44 @@
 export type AuthMode = 'signin' | 'register_request';
 
-export interface LoginCredentials {
-  email: string;
-  password: string;
-}
+export type StaffRole = 
+  | 'Doctor' 
+  | 'Nurse' 
+  | 'Lab Technician' 
+  | 'Pharmacist' 
+  | 'Cashier' 
+  | 'Administrator';
 
-export interface RegisterRequestCredentials {
-  full_name: string;
-  email: string;
-  requested_role: string;
-  department: string;
-  reason: string;
-}
+// Dynamic department dictionary based on role
+export const ROLE_DEPARTMENTS: Record<StaffRole, string[]> = {
+  Doctor: [
+    'Cardiology',
+    'General Medicine',
+    'Pediatrics',
+    'Orthopedics',
+    'Dermatology',
+    'Neurology'
+  ],
+  Nurse: [
+    'Emergency & Triage Unit',
+    'Intensive Care Unit (ICU)',
+    'Inpatient Surgical Ward',
+    'Pediatric Care Ward'
+  ],
+  'Lab Technician': [
+    'Clinical Hematology',
+    'Clinical Biochemistry',
+    'Microbiology & Serology',
+    'Pathology Division'
+  ],
+  Pharmacist: [
+    'Central Outpatient Dispensary',
+    'Inpatient Clinical Pharmacy'
+  ],
+  Cashier: [
+    'Central Billing & Revenue Desk'
+  ],
+  Administrator: [
+    'Hospital Executive Directorate',
+    'Health Informatics & IT'
+  ]
+};
