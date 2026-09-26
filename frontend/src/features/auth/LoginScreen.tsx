@@ -4,7 +4,7 @@ import axios from 'axios';
 import { AlertCircle, Loader2, Volume2, VolumeX } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-import { AuthMode, StaffRole } from './types';
+import { type AuthMode, type StaffRole } from './types';
 import { sound } from './utils/sound';
 import { AuthHeader } from './components/AuthHeader';
 import { InputField } from './components/InputField';
@@ -63,7 +63,7 @@ const LoginScreen: React.FC = () => {
       setErrorMessage(
         typeof detail === 'string' 
           ? detail 
-          : "Invalid staff credentials. Verify institutional email and password."
+          : "Invalid staff credentials. Verify email and master password."
       );
     } finally {
       setLoading(false);
@@ -89,16 +89,16 @@ const LoginScreen: React.FC = () => {
 
   const handleGoogleAuth = () => {
     sound.playClick();
-    alert("Authenticating with Google OAuth 2.0...\nAuthorized as Hospital Administrator.");
+    alert("Authenticating with Google OAuth 2.0...\nConnecting to Elixora Health Security Directory.");
     localStorage.setItem("mediflow_role", "Admin");
     sound.playSuccess();
     navigate('/');
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#F4F7FB] flex items-center justify-center p-3 sm:p-6 lg:p-8 font-sans antialiased text-[#0F172A] relative select-none">
+    <div className="min-h-screen w-full bg-[#F4F7FB] flex flex-col justify-center items-center p-3 sm:p-6 lg:p-8 font-sans antialiased text-[#0F172A] relative select-none">
       
-      {/* TACTILE AUDIO MUTE TOGGLE (TOP-RIGHT CORNER) */}
+      {/* TACTILE AUDIO MUTE/UNMUTE BUTTON */}
       <button
         onClick={toggleSound}
         className="fixed top-4 right-4 p-2 rounded-full bg-white border border-[#DCE4EC] text-[#64748B] hover:text-[#143A82] shadow-2xs transition-colors z-50 cursor-pointer"
@@ -107,20 +107,34 @@ const LoginScreen: React.FC = () => {
         {audioEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
       </button>
 
-      {/* MASTER SPLIT-PANEL CONTAINER (EQUAL HEIGHT ON DESKTOP & FLUID ON MOBILE) */}
-      <div className="w-full max-w-5xl bg-white border border-[#DCE4EC] rounded-xl shadow-[0_4px_24px_rgba(15,31,68,0.06)] overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[640px]">
+      {/* TOP HOSPITAL BRAND NAME */}
+      <motion.div 
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-center mb-5"
+      >
+        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-wider text-[#143A82] uppercase">
+          Elixora Health Care
+        </h1>
+        <p className="text-[11px] text-[#2E6F9E] tracking-widest font-semibold uppercase mt-0.5">
+          Center of Excellence • Digital Hospital Portal
+        </p>
+      </motion.div>
+
+      {/* MASTER SPLIT-PANEL CONTAINER (EQUALIZED HEIGHT & RESPONSIVE) */}
+      <div className="w-full max-w-5xl bg-white border border-[#DCE4EC] rounded-xl shadow-[0_8px_30px_rgba(15,31,68,0.06)] overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[600px]">
         
-        {/* LEFT COLUMN: EDITORIAL INSTITUTIONAL SHOWCASE (6 COLS) */}
+        {/* LEFT COLUMN: ARCHITECTURAL SLIDESHOW & CARDIAC WAVE */}
         <HospitalShowcase />
 
-        {/* RIGHT COLUMN: BALANCED INTERACTIVE FORM (6 COLS, UNIFORM HEIGHT) */}
-        <div className="lg:col-span-6 p-6 sm:p-10 flex flex-col justify-between bg-white relative">
+        {/* RIGHT COLUMN: INTERACTIVE FORM (EQUAL HEIGHT, NO VERTICAL JUMPS) */}
+        <div className="lg:col-span-6 p-6 sm:p-9 flex flex-col justify-between bg-white relative">
           
           {/* HEADER WITH REAL LOGO IMAGE */}
           <AuthHeader mode={mode} />
 
-          {/* BALANCED TAB SWITCHER (Zero Jumping, Smooth Animated Pill) */}
-          <div className="relative grid grid-cols-2 bg-[#F1F5F9] p-1 rounded-md border border-[#DCE4EC] my-4">
+          {/* TAB SWITCHER */}
+          <div className="relative grid grid-cols-2 bg-[#F1F5F9] p-1 rounded-md border border-[#DCE4EC] my-3">
             <button
               type="button"
               onClick={() => {
@@ -176,8 +190,8 @@ const LoginScreen: React.FC = () => {
             </motion.div>
           )}
 
-          {/* MAIN DYNAMIC FORM CONTAINER (EQUAL FIXED MIN-HEIGHT TO STOP VERTICAL JUMPS) */}
-          <div className="min-h-[340px] flex flex-col justify-center">
+          {/* DYNAMIC FORM CONTAINER */}
+          <div className="min-h-[300px] flex flex-col justify-center">
             <AnimatePresence mode="wait">
               {mode === 'signin' ? (
                 /* TAB 1: SIGN IN */
@@ -186,8 +200,8 @@ const LoginScreen: React.FC = () => {
                   initial={{ opacity: 0, x: -8 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 8 }}
-                  transition={{ duration: 0.16 }}
-                  className="space-y-3.5"
+                  transition={{ duration: 0.15 }}
+                  className="space-y-3"
                 >
                   <GoogleButton onClick={handleGoogleAuth} disabled={loading} />
 
@@ -212,7 +226,7 @@ const LoginScreen: React.FC = () => {
 
                     <InputField
                       id="staff-password"
-                      label="Security Password"
+                      label="Password"
                       type="password"
                       value={password}
                       onChange={setPassword}
@@ -231,8 +245,11 @@ const LoginScreen: React.FC = () => {
                       </label>
                       <button
                         type="button"
-                        onClick={() => alert("Contact Super Administrator to reset institutional access.")}
-                        className="text-[#2E6F9E] hover:underline font-semibold"
+                        onClick={() => {
+                          sound.playClick();
+                          alert("Contact Super Administrator to reset password.");
+                        }}
+                        className="text-[#2E6F9E] hover:underline font-semibold cursor-pointer"
                       >
                         Forgot password?
                       </button>
@@ -241,7 +258,8 @@ const LoginScreen: React.FC = () => {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="w-full py-2.5 px-4 bg-[#143A82] hover:bg-[#0D2659] active:scale-[0.98] text-white rounded-md text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-50 flex items-center justify-center space-x-2 cursor-pointer shadow-xs mt-3"
+                      onClick={() => sound.playClick()}
+                      className="w-full py-2.5 px-4 bg-[#143A82] hover:bg-[#0D2659] active:scale-[0.98] text-white rounded-md text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-50 flex items-center justify-center space-x-2 cursor-pointer shadow-xs mt-2"
                     >
                       {loading ? (
                         <>
@@ -255,13 +273,13 @@ const LoginScreen: React.FC = () => {
                   </form>
                 </motion.div>
               ) : (
-                /* TAB 2: CREATE ACCOUNT WITH DYNAMIC DEPARTMENTS & EQUALIZED HEIGHT */
+                /* TAB 2: CREATE ACCOUNT WITH DYNAMIC DEPARTMENTS */
                 <motion.div
                   key="register-form"
                   initial={{ opacity: 0, x: 8 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -8 }}
-                  transition={{ duration: 0.16 }}
+                  transition={{ duration: 0.15 }}
                 >
                   <form onSubmit={handleRegisterRequest} className="space-y-2.5">
                     <InputField
@@ -301,9 +319,10 @@ const LoginScreen: React.FC = () => {
 
                     <button
                       type="submit"
-                      className="w-full py-2.5 px-4 bg-[#2E6F9E] hover:bg-[#205175] active:scale-[0.98] text-white rounded-md text-xs font-bold uppercase tracking-wider transition-all cursor-pointer shadow-xs mt-3"
+                      onClick={() => sound.playClick()}
+                      className="w-full py-2.5 px-4 bg-[#2E6F9E] hover:bg-[#205175] active:scale-[0.98] text-white rounded-md text-xs font-bold uppercase tracking-wider transition-all cursor-pointer shadow-xs mt-2"
                     >
-                      Create Account & Submit for Verification
+                      Create Account & Submit for Approval
                     </button>
                   </form>
                 </motion.div>
@@ -312,7 +331,7 @@ const LoginScreen: React.FC = () => {
           </div>
 
           {/* CLEAN COMPACT FOOTER */}
-          <div className="pt-3 text-center text-[10px] text-[#94A3B8] border-t border-[#E2E8F0]">
+          <div className="pt-2 text-center text-[10px] text-[#94A3B8] border-t border-[#E2E8F0]">
             Elixora Health Platform • Protected Institutional System
           </div>
         </div>

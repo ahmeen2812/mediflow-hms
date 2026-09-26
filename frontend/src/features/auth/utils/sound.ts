@@ -2,8 +2,20 @@ class ClinicalSoundEngine {
   private ctx: AudioContext | null = null;
   public enabled: boolean = true;
 
-  private getContext(): AudioContext | null {
-    if (typeof window === 'undefined') return null;
+  constructor() {
+    if (typeof window !== 'undefined') {
+      const unlock = () => {
+        this.init();
+        window.removeEventListener('pointerdown', unlock);
+        window.removeEventListener('keydown', unlock);
+      };
+      window.addEventListener('pointerdown', unlock, { passive: true });
+      window.addEventListener('keydown', unlock, { passive: true });
+    }
+  }
+
+  private init() {
+    if (typeof window === 'undefined') return;
     if (!this.ctx) {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
       if (AudioCtx) this.ctx = new AudioCtx();
@@ -11,128 +23,132 @@ class ClinicalSoundEngine {
     if (this.ctx && this.ctx.state === 'suspended') {
       this.ctx.resume();
     }
-    return this.ctx;
   }
 
-  // 1. Tactile Mechanical Switch (20ms damp click)
+  // Crisp mechanical tactile click (audible, pleasant switch sound)
   public playClick() {
     if (!this.enabled) return;
-    try {
-      const ctx = this.getContext();
-      if (!ctx) return;
+    this.init();
+    if (!this.ctx) return;
 
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
+    try {
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
 
       osc.type = 'triangle';
-      osc.frequency.setValueAtTime(950, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(320, ctx.currentTime + 0.022);
+      osc.frequency.setValueAtTime(1000, now);
+      osc.frequency.exponentialRampToValueAtTime(150, now + 0.035);
 
-      gain.gain.setValueAtTime(0.04, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.022);
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
 
       osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.022);
+      gain.connect(this.ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.035);
     } catch {}
   }
 
-  // 2. Gentle Input Focus Chime (Soft airy frequency)
+  // Soft airy focus chime
   public playFocus() {
     if (!this.enabled) return;
-    try {
-      const ctx = this.getContext();
-      if (!ctx) return;
+    this.init();
+    if (!this.ctx) return;
 
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
+    try {
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
 
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
-      osc.frequency.exponentialRampToValueAtTime(880.00, ctx.currentTime + 0.04); // A5
+      osc.frequency.setValueAtTime(540, now);
+      osc.frequency.exponentialRampToValueAtTime(820, now + 0.04);
 
-      gain.gain.setValueAtTime(0.015, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.04);
+      gain.gain.setValueAtTime(0.04, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
 
       osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.04);
+      gain.connect(this.ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.04);
     } catch {}
   }
 
-  // 3. Tab Slide Audio Feedback
+  // Tab switch slide sound
   public playTabSwitch() {
     if (!this.enabled) return;
-    try {
-      const ctx = this.getContext();
-      if (!ctx) return;
+    this.init();
+    if (!this.ctx) return;
 
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
+    try {
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
 
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(420, ctx.currentTime);
-      osc.frequency.linearRampToValueAtTime(650, ctx.currentTime + 0.03);
+      osc.frequency.setValueAtTime(400, now);
+      osc.frequency.linearRampToValueAtTime(680, now + 0.035);
 
-      gain.gain.setValueAtTime(0.03, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.03);
+      gain.gain.setValueAtTime(0.05, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
 
       osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.03);
+      gain.connect(this.ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.035);
     } catch {}
   }
 
-  // 4. Harmonic Success Chord (Double Tone)
+  // Harmonic success chord
   public playSuccess() {
     if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+
     try {
-      const ctx = this.getContext();
-      if (!ctx) return;
-
-      const playTone = (freq: number, start: number, duration: number) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
+      const now = this.ctx.currentTime;
+      [523.25, 659.25, 783.99].forEach((freq, idx) => {
+        const osc = this.ctx!.createOscillator();
+        const gain = this.ctx!.createGain();
         osc.type = 'triangle';
-        osc.frequency.setValueAtTime(freq, ctx.currentTime + start);
-        gain.gain.setValueAtTime(0.04, ctx.currentTime + start);
-        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + start + duration);
+        osc.frequency.setValueAtTime(freq, now + idx * 0.06);
+        gain.gain.setValueAtTime(0.06, now + idx * 0.06);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.06 + 0.22);
         osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(ctx.currentTime + start);
-        osc.stop(ctx.currentTime + start + duration);
-      };
-
-      playTone(523.25, 0.0, 0.15); // C5
-      playTone(659.25, 0.07, 0.22); // E5
-      playTone(783.99, 0.14, 0.35); // G5
+        gain.connect(this.ctx!.destination);
+        osc.start(now + idx * 0.06);
+        osc.stop(now + idx * 0.06 + 0.22);
+      });
     } catch {}
   }
 
-  // 5. Error Warning Tap
+  // Error warning tone
   public playError() {
     if (!this.enabled) return;
-    try {
-      const ctx = this.getContext();
-      if (!ctx) return;
+    this.init();
+    if (!this.ctx) return;
 
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
+    try {
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
 
       osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(180, ctx.currentTime);
-      osc.frequency.setValueAtTime(140, ctx.currentTime + 0.05);
+      osc.frequency.setValueAtTime(220, now);
+      osc.frequency.setValueAtTime(160, now + 0.06);
 
-      gain.gain.setValueAtTime(0.05, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
 
       osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.12);
+      gain.connect(this.ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.12);
     } catch {}
   }
 }

@@ -8,7 +8,6 @@ export type StaffRole =
   | 'Cashier' 
   | 'Administrator';
 
-// Dynamic department dictionary based on role
 export const ROLE_DEPARTMENTS: Record<StaffRole, string[]> = {
   Doctor: [
     'Cardiology',

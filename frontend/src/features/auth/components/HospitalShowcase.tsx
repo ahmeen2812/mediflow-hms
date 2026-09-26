@@ -1,74 +1,142 @@
-import React from 'react';
-import { Activity, ShieldCheck, CheckCircle2 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ShieldCheck, Award, HeartPulse } from 'lucide-react';
+
+interface Slide {
+  image: string;
+  facility: string;
+  tagline: string;
+  badge: string;
+}
+
+const HOSPITAL_SLIDES: Slide[] = [
+  {
+    image: 'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=1200&q=80',
+    facility: 'Central Medical Tower & Trauma Pavilion',
+    tagline: 'Precision Outpatient Care & Advanced Clinical Architecture',
+    badge: 'Tertiary Care Center'
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1200&q=80',
+    facility: 'Institute of Cardiovascular Therapeutics',
+    tagline: 'Interventional Cardiology, Electrophysiology & Surgical Suites',
+    badge: 'Cardiac Directorate'
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1200&q=80',
+    facility: 'Diagnostic Imaging & Automated Laboratory Complex',
+    tagline: 'Continuous Point-of-Care Testing & 24/7 Formulary Dispensing',
+    badge: 'ISO-15189 Accredited'
+  }
+];
 
 export const HospitalShowcase: React.FC = () => {
-  return (
-    <div className="hidden lg:flex lg:col-span-6 flex-col justify-between p-10 bg-[#143A82] text-white select-none relative overflow-hidden">
-      {/* REFINED ARCHITECTURAL MEDICAL GRID PATTERN */}
-      <div 
-        className="absolute inset-0 opacity-10 pointer-events-none"
-        style={{
-          backgroundImage: `radial-gradient(circle, #ffffff 1px, transparent 1px)`,
-          backgroundSize: '24px 24px'
-        }}
-      />
+  const [currentSlide, setCurrentSlide] = useState(0);
 
-      {/* TOP INSTITUTIONAL IDENTITY */}
-      <div className="flex items-center justify-between z-10">
-        <div className="flex items-center space-x-2">
-          <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-[11px] font-bold tracking-widest uppercase text-white/80">
-            Node Online • Regional Care Network
+  // Auto-advance slides every 6 seconds
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % HOSPITAL_SLIDES.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const slide = HOSPITAL_SLIDES[currentSlide];
+
+  return (
+    <div className="hidden lg:flex lg:col-span-6 flex-col justify-between p-8 sm:p-10 bg-[#102A6B] text-white select-none relative overflow-hidden">
+      
+      {/* 1. AUTO-ADVANCING ARCHITECTURAL SLIDESHOW WITH SMOOTH CROSSFADE */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentSlide}
+          initial={{ opacity: 0, scale: 1.05 }}
+          animate={{ opacity: 0.32, scale: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1.2, ease: "easeOut" }}
+          className="absolute inset-0 bg-cover bg-center mix-blend-overlay pointer-events-none"
+          style={{ backgroundImage: `url('${slide.image}')` }}
+        />
+      </AnimatePresence>
+
+      {/* SOLID OVERLAY VIGNETTE */}
+      <div className="absolute inset-0 bg-gradient-to-t from-[#0C1F4D] via-transparent to-[#102A6B]/80 pointer-events-none" />
+
+      {/* 2. TOP BRAND TITLE & ANIMATED ECG CARDIAC LINE */}
+      <div className="z-10 space-y-2">
+        <div className="flex justify-between items-center text-xs tracking-widest uppercase font-bold text-sky-200">
+          <span>Elixora Health Care</span>
+          <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-white/10 border border-white/15">
+            Since 2026
           </span>
         </div>
-        <span className="text-[10px] font-mono text-white/60">v1.4.0-Enterprise</span>
+
+        {/* Animated ECG Pulse Rhythm Vector */}
+        <div className="w-full h-8 overflow-hidden relative opacity-70">
+          <svg viewBox="0 0 500 50" className="w-full h-full stroke-sky-300 fill-none" preserveAspectRatio="none">
+            <motion.path
+              d="M 0 25 L 120 25 L 135 10 L 150 42 L 165 5 L 180 35 L 195 25 L 320 25 L 335 10 L 350 42 L 365 5 L 380 35 L 395 25 L 500 25"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              initial={{ pathLength: 0, opacity: 0.4 }}
+              animate={{ pathLength: [0, 1, 1], opacity: [0.3, 1, 0.3] }}
+              transition={{ duration: 2.8, repeat: Infinity, ease: "linear" }}
+            />
+          </svg>
+        </div>
       </div>
 
-      {/* CENTER EDITORIAL MISSION STATEMENT */}
-      <motion.div 
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-        className="my-auto space-y-6 z-10"
-      >
-        <div className="space-y-2">
-          <span className="text-[11px] font-extrabold uppercase tracking-widest text-sky-200">
-            Clinical Command Architecture
-          </span>
-          <h2 className="text-3xl font-extrabold tracking-tight leading-tight">
-            Precision Healthcare. <br />
-            Unified Outpatient Operations.
-          </h2>
-          <p className="text-xs text-white/80 leading-relaxed max-w-sm pt-1 font-normal">
-            Connecting reception queues, clinical diagnostics, automated drug formularies, and point-of-care patient medical wallets into a single ledger.
-          </p>
-        </div>
+      {/* 3. CENTER SHOWCASE: DYNAMIC FACILITY OVERVIEW */}
+      <div className="my-auto z-10 space-y-4">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentSlide}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.4 }}
+            className="space-y-2.5"
+          >
+            <span className="inline-flex items-center text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded bg-white/15 border border-white/20 text-sky-200">
+              <HeartPulse size={12} className="mr-1.5 text-sky-300" />
+              {slide.badge}
+            </span>
 
-        {/* SOLID METRICS TAPE */}
-        <div className="grid grid-cols-2 gap-3 pt-2">
-          <div className="p-3.5 bg-white/10 border border-white/15 rounded-md">
-            <p className="text-[10px] font-bold text-sky-200 uppercase tracking-widest">Active System State</p>
-            <p className="text-xl font-bold font-mono mt-0.5">99.98%</p>
-            <p className="text-[10px] text-white/60">Core EHR uptime</p>
-          </div>
-          <div className="p-3.5 bg-white/10 border border-white/15 rounded-md">
-            <p className="text-[10px] font-bold text-sky-200 uppercase tracking-widest">Security Protocol</p>
-            <p className="text-xl font-bold font-mono mt-0.5">TLS 1.3</p>
-            <p className="text-[10px] text-white/60">Strict 256-bit isolation</p>
-          </div>
-        </div>
-      </motion.div>
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight leading-tight text-white">
+              {slide.facility}
+            </h2>
 
-      {/* FOOTER VERIFICATION */}
-      <div className="pt-6 border-t border-white/15 flex items-center justify-between text-[11px] text-white/70 z-10 font-medium">
+            <p className="text-xs text-sky-100/80 leading-relaxed font-normal max-w-sm">
+              {slide.tagline}
+            </p>
+          </motion.div>
+        </AnimatePresence>
+
+        {/* SLIDE PROGRESSION DOTS */}
+        <div className="flex space-x-2 pt-2">
+          {HOSPITAL_SLIDES.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentSlide(index)}
+              className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                currentSlide === index ? 'w-8 bg-sky-300' : 'w-2 bg-white/30 hover:bg-white/50'
+              }`}
+              title={`Slide ${index + 1}`}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* 4. BOTTOM INSTITUTIONAL VERIFICATION */}
+      <div className="z-10 pt-4 border-t border-white/15 flex justify-between items-center text-[11px] text-white/70">
         <div className="flex items-center space-x-1.5">
-          <CheckCircle2 size={13} className="text-emerald-300" />
-          <span>Elixora Health • Verified Care Facility</span>
+          <Award size={13} className="text-sky-300" />
+          <span>JCI & Healthcare Commission Certified</span>
         </div>
         <div className="flex items-center space-x-1.5">
-          <ShieldCheck size={13} className="text-sky-200" />
-          <span>ISO 27001 Certified</span>
+          <ShieldCheck size={13} className="text-emerald-300" />
+          <span>Continuous Security Audit</span>
         </div>
       </div>
     </div>
